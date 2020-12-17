@@ -9,6 +9,18 @@ resource "aws_route_table" "private_rt" {
   }
 
   tags = {
-    Name = "Private-RT-${count.index}"
+    Name = "Private-RT-${count.index + 1}"
   }
+}
+
+resource "aws_route_table_association" "private_rt_association_a" {
+  count          = length(aws_subnet.private_subnet)
+  subnet_id      = aws_subnet.private_subnet[0].id
+  route_table_id = aws_route_table.private_rt[0].id
+}
+
+resource "aws_route_table_association" "private_rt_association_b" {
+  count          = length(aws_subnet.db_subnet)
+  subnet_id      = aws_subnet.db_subnet[0].id
+  route_table_id = aws_route_table.private_rt[0].id
 }
