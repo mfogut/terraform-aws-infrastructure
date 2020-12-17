@@ -66,7 +66,7 @@ resource "aws_security_group" "app_server_sg" {
   }
 }
 
-resource "aws_security_group_rule" "app_server_sg_rule" {
+resource "aws_security_group_rule" "app_server_sg_http_rule" {
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
@@ -75,7 +75,7 @@ resource "aws_security_group_rule" "app_server_sg_rule" {
   security_group_id        = aws_security_group.app_server_sg.id
 }
 
-resource "aws_security_group_rule" "app_server_sg_rule" {
+resource "aws_security_group_rule" "app_server_sg__ssh_rule" {
   type                     = "ingress"
   from_port                = 22
   to_port                  = 22
