@@ -9,12 +9,17 @@ resource "aws_autoscaling_group" "app_server_autoscaling_group" {
   max_size                  = 4
   health_check_type         = "EC2"
   force_delete              = true
+
+  tag {
+    key                 = "Name"
+    value               = "App-Server"
+    propagate_at_launch = true
+  }
 }
 
 
 resource "aws_autoscaling_policy" "cpu_usage_greater80" {
-  #count                  = length(aws_autoscaling_group.app_server_autoscaling_group)
-  name                   = "CPU-Track"
+  name                   = "High-CPU-Track"
   autoscaling_group_name = aws_autoscaling_group.app_server_autoscaling_group.name
   policy_type            = "SimpleScaling"
   adjustment_type        = "ChangeInCapacity"
@@ -24,7 +29,6 @@ resource "aws_autoscaling_policy" "cpu_usage_greater80" {
 
 #Cloudwatch Metric
 resource "aws_cloudwatch_metric_alarm" "cpu_greater80" {
-  #count               = length(aws_autoscaling_policy.cpu_usage_greater80)
   alarm_name          = "High-CPUUtilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -37,11 +41,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_greater80" {
   alarm_actions       = [aws_autoscaling_policy.cpu_usage_greater80.arn]
 }
 
-
-
 resource "aws_autoscaling_policy" "cpu_usage_less30" {
-  #count                  = length(aws_autoscaling_group.app_server_autoscaling_group)
-  name                   = "CPU-Track"
+  name                   = "Low-CPU-Track"
   autoscaling_group_name = aws_autoscaling_group.app_server_autoscaling_group.name
   policy_type            = "SimpleScaling"
   adjustment_type        = "ChangeInCapacity"
@@ -51,9 +52,8 @@ resource "aws_autoscaling_policy" "cpu_usage_less30" {
 
 #Cloudwatch Metric
 resource "aws_cloudwatch_metric_alarm" "cpu_less30" {
-  #count               = length(aws_autoscaling_policy.cpu_usage_less35)
   alarm_name          = "Low-CPUUtilization"
-  comparison_operator = "LessThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
