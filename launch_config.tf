@@ -1,5 +1,5 @@
 resource "aws_launch_configuration" "app_server" {
-  name_prefix       = "App-Server-"
+  name              = "App-Server"
   image_id          = data.aws_ami.app_server.id
   instance_type     = "t2.micro"
   key_name          = "demo"

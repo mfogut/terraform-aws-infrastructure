@@ -1,31 +1,30 @@
 resource "aws_autoscaling_group" "app_server_autoscaling_group" {
-  count                     = length(aws_subnet.public_subnet)
-  name                      = "Terraform-Auto-Scaling-Group-${count.index + 1}"
-  max_size                  = 5
-  min_size                  = 1
-  health_check_grace_period = 180
-  health_check_type         = "ELB"
-  desired_capacity          = 3
-  force_delete              = true
+  name                      = "Terraform-Auto-Scaling-Group"
   launch_configuration      = aws_launch_configuration.app_server.name
-  vpc_zone_identifier       = [aws_subnet.private_subnet[count.index].id]
+  vpc_zone_identifier       = aws_subnet.private_subnet.*.id
   target_group_arns         = [aws_lb_target_group.alb_tg.arn]
+  health_check_grace_period = 180
+  desired_capacity          = 2
+  min_size                  = 1
+  max_size                  = 4
+  health_check_type         = "EC2"
+  force_delete              = true
 }
 
 
 resource "aws_autoscaling_policy" "cpu_usage_greater80" {
-  count                  = length(aws_autoscaling_group.app_server_autoscaling_group)
-  name                   = "CPU-Usage"
-  autoscaling_group_name = aws_autoscaling_group.app_server_autoscaling_group[count.index].name
+  #count                  = length(aws_autoscaling_group.app_server_autoscaling_group)
+  name                   = "CPU-Track"
+  autoscaling_group_name = aws_autoscaling_group.app_server_autoscaling_group.name
   policy_type            = "SimpleScaling"
-  scaling_adjustment     = 1
   adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1
   cooldown               = 300
 }
 
 #Cloudwatch Metric
 resource "aws_cloudwatch_metric_alarm" "cpu_greater80" {
-  count               = length(aws_autoscaling_policy.cpu_usage_greater80)
+  #count               = length(aws_autoscaling_policy.cpu_usage_greater80)
   alarm_name          = "High-CPUUtilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -35,24 +34,24 @@ resource "aws_cloudwatch_metric_alarm" "cpu_greater80" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "This metric monitors ec2 cpu utilization"
-  alarm_actions       = aws_autoscaling_policy.cpu_usage_greater80.*.arn
+  alarm_actions       = [aws_autoscaling_policy.cpu_usage_greater80.arn]
 }
 
 
 
-resource "aws_autoscaling_policy" "cpu_usage_less35" {
-  count                  = length(aws_autoscaling_group.app_server_autoscaling_group)
-  name                   = "CPU-Usage"
-  autoscaling_group_name = aws_autoscaling_group.app_server_autoscaling_group[count.index].name
+resource "aws_autoscaling_policy" "cpu_usage_less30" {
+  #count                  = length(aws_autoscaling_group.app_server_autoscaling_group)
+  name                   = "CPU-Track"
+  autoscaling_group_name = aws_autoscaling_group.app_server_autoscaling_group.name
   policy_type            = "SimpleScaling"
-  scaling_adjustment     = -1
   adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = -1
   cooldown               = 300
 }
 
 #Cloudwatch Metric
-resource "aws_cloudwatch_metric_alarm" "cpu_less35" {
-  count               = length(aws_autoscaling_policy.cpu_usage_less35)
+resource "aws_cloudwatch_metric_alarm" "cpu_less30" {
+  #count               = length(aws_autoscaling_policy.cpu_usage_less35)
   alarm_name          = "Low-CPUUtilization"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "2"
@@ -60,7 +59,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_less35" {
   namespace           = "AWS/EC2"
   period              = "120"
   statistic           = "Average"
-  threshold           = "35"
+  threshold           = "30"
   alarm_description   = "This metric monitors ec2 cpu utilization"
-  alarm_actions       = aws_autoscaling_policy.cpu_usage_less35.*.arn
+  alarm_actions       = [aws_autoscaling_policy.cpu_usage_less30.arn]
 }
