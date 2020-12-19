@@ -5,5 +5,5 @@ resource "aws_launch_configuration" "app_server" {
   key_name          = "demo"
   security_groups   = [aws_security_group.app_server_sg.id]
   placement_tenancy = "default"
-  #user_data         = file(apache.sh)
+  user_data         = file("apache.sh")
 }
