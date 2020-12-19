@@ -4,9 +4,9 @@ resource "aws_autoscaling_group" "app_server_autoscaling_group" {
   vpc_zone_identifier       = aws_subnet.private_subnet.*.id
   target_group_arns         = [aws_lb_target_group.alb_tg.arn]
   health_check_grace_period = 180
-  desired_capacity          = 2
-  min_size                  = 1
-  max_size                  = 4
+  desired_capacity          = 3
+  min_size                  = 2
+  max_size                  = 5
   health_check_type         = "EC2"
   force_delete              = true
 
