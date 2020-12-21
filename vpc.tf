@@ -11,3 +11,8 @@ output "VPC_CIDR_BLOCK" {
   value       = aws_vpc.my_vpc.cidr_block
   description = "CidrBlock for Terraform-VPC"
 }
+
+output "AWS_REGION_NAME" {
+  value       = var.aws_region
+  description = "CidrBlock for Terraform-VPC"
+}
