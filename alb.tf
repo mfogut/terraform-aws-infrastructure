@@ -3,9 +3,8 @@ resource "aws_lb" "alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = aws_subnet.public_subnet.*.id
+  subnets            = local.public_subnets_id
 }
-
 
 resource "aws_alb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
