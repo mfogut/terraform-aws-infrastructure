@@ -7,6 +7,15 @@ resource "aws_vpc" "my_vpc" {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket         = "tr-backup-s3-bucket"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-backup"
+  }
+}
+
 output "VPC_CIDR_BLOCK" {
   value       = aws_vpc.my_vpc.cidr_block
   description = "CidrBlock for Terraform-VPC"
