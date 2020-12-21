@@ -1,7 +1,7 @@
 resource "aws_autoscaling_group" "app_server_autoscaling_group" {
   name                      = "Terraform-Auto-Scaling-Group"
   launch_configuration      = aws_launch_configuration.app_server.name
-  vpc_zone_identifier       = aws_subnet.private_subnet.*.id
+  vpc_zone_identifier       = local.private_subnets_id
   target_group_arns         = [aws_lb_target_group.alb_tg.arn]
   health_check_grace_period = 180
   desired_capacity          = 3
