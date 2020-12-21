@@ -8,7 +8,6 @@ resource "aws_db_instance" "db_instances" {
   name                   = "mydb"
   username               = local.db_username
   password               = local.db_password
-  parameter_group_name   = "db_instances.mysql5.7"
   db_subnet_group_name   = aws_db_subnet_group.db_subnets.name
   vpc_security_group_ids = [aws_security_group.app_server_sg.id]
 
@@ -28,7 +27,7 @@ resource "aws_db_subnet_group" "db_subnets" {
   }
 }
 
-output "Subnet_Group_IDs" {
+output "DB_Subnet_Group_IDs" {
   value       = aws_db_subnet_group.db_subnets.subnet_ids
   description = "Subnet Group IDs for DB instances."
 }
